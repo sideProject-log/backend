@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  username     String
+  introduction String
+  emoji        String
+  profile      String
+  snsId        String     @unique
+
+  bookmarks    Bookmark[]
+  comments     Comments[]
+  records      Record[]
+
+  @@index([username])
+}
+
+model Bookmark {
+  id        Int    @id @default(autoincrement())
+  user_id   Int
+  record_id Int
+  user      User   @relation(fields: [user_id], references: [id])
+  record    Record @relation(fields: [record_id], references: [id])
+
+  @@index([user_id])
+  @@index([record_id])
+}
+
+model Comments {
+  id        Int    @id @default(autoincrement())
+  record_id Int
+  user_id   Int
+  comment   String
+  record    Record @relation(fields: [record_id], references: [id])
+  user      User   @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([record_id])
+}
+
+model Record {
+  id         Int        @id @default(autoincrement())
+  title      String
+  emoji      String
+  content    String
+  created_at DateTime   @default(now())
+  background String
+  user_id    Int
+  bookmark   Bookmark[]
+  comments   Comments[]
+  user       User       @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([title])
+  @@index([content])
+  @@index([created_at])
+  @@index([emoji])
+}
