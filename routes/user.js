@@ -71,7 +71,32 @@ router.get("/bookmarks", isLoggedIn, async (req, res) => {
       },
     });
 
-    res.status(201).json({ status: "ok", data: records });
+    const RecordsWithCounts = await Promise.all(
+      records.map(async (record) => {
+        const emojis = await prismaClient.comments.count({
+          where: {
+            user_id: req.user.id,
+            record_id: record.id,
+          },
+        });
+
+        const user = await prismaClient.user.findUnique({
+          where: {
+            id: record.user_id,
+          },
+        });
+
+        return {
+          ...record,
+          emojiCount: emojis,
+          writer: user.username,
+        };
+      })
+    );
+
+    console.log(RecordsWithCounts);
+
+    res.status(201).json({ status: "ok", data: RecordsWithCounts });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "서버 에러", message: error.message });

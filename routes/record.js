@@ -42,6 +42,7 @@ router.get("/getAll", async (req, res) => {
       return {
         ...record,
         writer: record.user.username,
+        // profileImg: record.user.profile,
         emojiCount: record.comments.length, // 댓글 수 계산
       };
     });
@@ -55,19 +56,30 @@ router.get("/getAll", async (req, res) => {
 
 // record 상세 조회
 router.get("/detail/:id", async (req, res) => {
+  let record = null;
   try {
     const id = req.params.id * 1;
-    let record = await prismaClient.record.findUnique({
-      where: { id: Number(id) },
+    record = await prismaClient.record.findUnique({
+      where: { id },
     });
+    console.log(record);
 
     if (req.user) {
-      const bookmarkId = await prismaClient.bookmark.findUnique({
+      const userId = +req.user.id;
+      let user = await prismaClient.user.findUnique({
+        where: { id: +record.user_id },
+      });
+      writer = user.username;
+      profileImage = user.profile;
+
+      console.log(writer);
+      let bookmark = await prismaClient.bookmark.findMany({
         where: {
-          user_id: req.user.id,
+          user_id: userId,
           record_id: id,
         },
       });
+      const bookmarkId = bookmark[0] ? bookmark[0].id : null;
 
       const comments = await prismaClient.comments.findMany({
         where: {
@@ -75,14 +87,16 @@ router.get("/detail/:id", async (req, res) => {
           record_id: id,
         },
       });
+
       const commentList = comments
         .map((comment) => comment.comment)
         .filter((value, index, self) => self.indexOf(value) === index);
 
-      record = { ...record, bookmarkId, commentList };
+      record = { ...record, writer, profileImage, bookmarkId, commentList };
     }
 
-    if (record) {
+    if (record !== null) {
+      console.log(record);
       res.status(200).json({ status: "ok", record });
     } else {
       res
@@ -90,6 +104,7 @@ router.get("/detail/:id", async (req, res) => {
         .json({ status: "error", message: "글을 찾을 수 없습니다." });
     }
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ status: "error", message: error.message });
   }
 });
