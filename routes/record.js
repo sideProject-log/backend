@@ -42,7 +42,6 @@ router.get("/getAll", async (req, res) => {
       return {
         ...record,
         writer: record.user.username,
-        // profileImg: record.user.profile,
         emojiCount: record.comments.length, // 댓글 수 계산
       };
     });
@@ -65,6 +64,7 @@ router.get("/detail/:id", async (req, res) => {
     console.log(record);
 
     if (req.user) {
+      console.log(req.user);
       const userId = +req.user.id;
       let user = await prismaClient.user.findUnique({
         where: { id: +record.user_id },
@@ -72,7 +72,6 @@ router.get("/detail/:id", async (req, res) => {
       writer = user.username;
       profileImage = user.profile;
 
-      console.log(writer);
       let bookmark = await prismaClient.bookmark.findMany({
         where: {
           user_id: userId,
