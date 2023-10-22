@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const passportConfig = require("./auth");
 const session = require("express-session");
+const cors = require("cors");
 
 const indexRouter = require("./routes/index");
 const recordRouter = require("./routes/record");
@@ -19,8 +20,10 @@ const authRouter = require("./routes/auth");
 const app = express();
 passportConfig();
 
-//request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
+//Cors 설정
+app.use(cors({ origin: ["localhost:3000", "localhost:8080"] }));
 
+//request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
