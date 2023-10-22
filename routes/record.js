@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { isLoggedIn } = require("../middleware/auth");
+const cookieParser = require("cookie-parser");
 const express = require("express");
 const router = express.Router();
 
@@ -19,6 +20,23 @@ router.get("/getAll", async (req, res) => {
       },
     });
 
+    if (req.user) {
+      const bookmarks = await prismaClient.bookmark.findMany({
+        where: {
+          user_id: req.user.id,
+        },
+      });
+      records.map((record) => {
+        bookmarks.map((bookmark) => {
+          if (record.id === bookmark.record_id) {
+            record.bookmarked = true;
+          } else {
+            record.bookmarked = false;
+          }
+        });
+      });
+    }
+
     // 각 게시글의 댓글 수 계산, 작성자
     const recordsWithCommentCount = records.map((record) => {
       return {
@@ -28,8 +46,9 @@ router.get("/getAll", async (req, res) => {
       };
     });
 
-    res.json(recordsWithCommentCount);
+    res.status(200).json({ status: "ok", data: recordsWithCommentCount });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "서버 오류" });
   }
 });
@@ -38,26 +57,51 @@ router.get("/getAll", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id * 1;
-    const record = await prismaClient.record.findUnique({
+    let record = await prismaClient.record.findUnique({
       where: { id: Number(id) },
     });
 
-    console.log(record);
+    if (req.user) {
+      const bookmarkId = await prismaClient.bookmark.findUnique({
+        where: {
+          user_id: req.user.id,
+          record_id: id,
+        },
+      });
+
+      const comments = await prismaClient.comments.findMany({
+        where: {
+          user_id: req.user.id,
+          record_id: id,
+        },
+      });
+      const commentList = comments
+        .map((comment) => comment.comment)
+        .filter((value, index, self) => self.indexOf(value) === index);
+
+      record = { ...record, bookmarkId, commentList };
+    }
 
     if (record) {
-      res.json(record);
+      res.status(200).json({ status: "ok", record });
     } else {
-      res.status(404).json({ error: "글을 찾을 수 없습니다." });
+      res
+        .status(404)
+        .json({ status: "error", message: "글을 찾을 수 없습니다." });
     }
   } catch (error) {
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 
 // record 작성
 router.post("/post", isLoggedIn, async (req, res) => {
   try {
-    const { title, emoji, content, background, user_id } = req.body;
+    const { title, emoji, content, background } = req.body;
+
+    const date = new Date();
+
+    date.setHours(date.getHours() + 9);
 
     const newRecord = await prismaClient.record.create({
       data: {
@@ -65,11 +109,12 @@ router.post("/post", isLoggedIn, async (req, res) => {
         emoji,
         content,
         background,
-        user_id: Number(user_id),
+        created_at: date,
+        user_id: Number(req.user.id),
       },
     });
 
-    res.status(201).json(newRecord);
+    res.status(201).json({ status: "ok", data: newRecord });
   } catch (error) {
     res.status(500).json({ error: "서버 에러", message: error.message });
   }
@@ -92,12 +137,13 @@ router.patch("/edit", isLoggedIn, async (req, res) => {
       },
     });
 
-    res.status(201).json(newRecord);
+    res.status(201).json({ statusbar: "ok", newRecord });
   } catch (error) {
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 
+//레코드 삭제
 router.delete("/remove", isLoggedIn, async () => {
   try {
     const { postId } = req.body;
@@ -110,7 +156,7 @@ router.delete("/remove", isLoggedIn, async () => {
 
     res.status(201).json(deletedRecord);
   } catch (error) {
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 

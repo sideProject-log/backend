@@ -19,7 +19,7 @@ router.post("/register", isLoggedIn, async (req, res, next) => {
     res.status(201).json({ status: "ok", newBookmark });
   } catch (error) {
     console.warn(error.message);
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 
@@ -36,7 +36,7 @@ router.delete("/remove", isLoggedIn, async (req, res, next) => {
     res.status(201).json({ status: "ok", result });
   } catch (error) {
     console.warn(error.message);
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 

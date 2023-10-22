@@ -10,12 +10,12 @@ const EmojiRegex = require("emoji-regex");
 // 이모지 댓글 등록
 router.post("/register", isLoggedIn, async (req, res, next) => {
   try {
-    const { userId, recordId, comment } = req.body;
+    const { userId, recordId, emoji } = req.body;
 
     const regex = EmojiRegex();
 
     if (!`${emoji}`.match(regex)) {
-      throw new Error(`Emoji ${comment} is not allowed.`);
+      throw new Error(`Emoji ${emoji} is not allowed.`);
     }
 
     const newComment = await prismaClient.comments.create({
@@ -28,19 +28,19 @@ router.post("/register", isLoggedIn, async (req, res, next) => {
 
     res.status(200).json({ status: "ok", newComment });
   } catch (error) {
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 
 // 이모지 삭제
 router.delete("/remove", isLoggedIn, async (req, res, next) => {
-  const { emojiId } = req.body;
+  const { commentId } = req.body;
 
   // TODO: 등록된 이모지 삭제
   try {
-    const result = await prismaClient.comments.delete({
+    await prismaClient.comments.delete({
       where: {
-        id: Number(emojiId),
+        id: Number(commentId),
       },
     });
     res
@@ -48,7 +48,7 @@ router.delete("/remove", isLoggedIn, async (req, res, next) => {
       .json({ status: "ok", message: "성공적으로 삭제되었습니다." });
   } catch (error) {
     console.warn(error.message);
-    res.status(500).json({ error: "서버 에러", message: error.message });
+    res.status(500).json({ status: "error", message: error.message });
   }
 });
 

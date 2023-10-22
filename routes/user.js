@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const express = require("express");
+const { isLoggedIn } = require("../middleware/auth");
 const router = express.Router();
 
 const prismaClient = new PrismaClient();
@@ -48,8 +49,82 @@ router.post("/create", async (req, res) => {
         profile,
       },
     });
+    console.log(newUser);
 
     res.status(201).json(newUser);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
+  }
+});
+
+//유저가 작성한 포스트 불러오기 - 아이디 미지정
+router.get("/records", isLoggedIn, async (req, res) => {
+  try {
+    const records = await prismaClient.record.findMany({
+      where: {
+        user_id: Number(req.user.id),
+      },
+    });
+
+    const recordData = records.map(async (record) => {
+      const bookmarks = await prismaClient.bookmark.count({
+        where: {
+          user_id: req.user.id,
+          record_id: record.id,
+        },
+      });
+      const emojis = await prismaClient.comments.count({
+        where: {
+          user_id: req.user.id,
+          record_id: record.id,
+        },
+      });
+
+      return{
+        ...record,
+        record.bookmarks = bookmarks;
+      record.emojis = emojis;
+      }
+    });
+
+    res.status(200).json({ status: "ok", records });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
+  }
+});
+
+//유저가 작성한 포스트 불러오기 - 아이디 지정
+router.get("/records/:id", async (req, res) => {
+  try {
+    const records = await prismaClient.record.findMany({
+      where: {
+        user_id: Number(req.params.id),
+      },
+    });
+
+    res.status(200).json({ status: "ok", records });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
+  }
+});
+
+//유저가 북마크한 정보 불러오기
+router.get("/bookmarks", isLoggedIn, async (req, res) => {
+  try {
+    const records = await prismaClient.record.findMany({
+      where: {
+        bookmark: {
+          some: {
+            user_id: req.user.id,
+          },
+        },
+      },
+    });
+
+    res.status(201).json({ status: "ok", data: records });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "서버 에러", message: error.message });

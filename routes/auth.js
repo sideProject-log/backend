@@ -4,7 +4,7 @@ const passport = require("passport");
 const router = express.Router();
 
 //카카오 로그인 요청 감지
-router.get("/kakao", passport.authenticate("kakao"));
+router.get("/kakao", isNotLoggedIn, passport.authenticate("kakao"));
 
 //카카오 로그인 콜백
 router.get(
@@ -16,5 +16,13 @@ router.get(
     res.redirect("http://localhost:3000");
   }
 );
+
+router.get("/isLogin", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    result: req.isAuthenticated(),
+    user: req.user,
+  });
+});
 
 module.exports = router;
