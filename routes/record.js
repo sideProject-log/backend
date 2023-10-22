@@ -8,9 +8,27 @@ const prismaClient = new PrismaClient();
 // record 전체 조회
 router.get("/getAll", async (req, res) => {
   try {
-    const records = await prismaClient.record.findMany();
-    console.log(records);
-    res.json(records);
+    const records = await prismaClient.record.findMany({
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+        comments: true, // 댓글을 가져오기 위한 include
+      },
+    });
+
+    // 각 게시글의 댓글 수 계산, 작성자
+    const recordsWithCommentCount = records.map((record) => {
+      return {
+        ...record,
+        writer: record.user.username,
+        emojiCount: record.comments.length, // 댓글 수 계산
+      };
+    });
+
+    res.json(recordsWithCommentCount);
   } catch (error) {
     res.status(500).json({ error: "서버 오류" });
   }
