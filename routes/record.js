@@ -54,7 +54,7 @@ router.get("/getAll", async (req, res) => {
 });
 
 // record 상세 조회
-router.get("/:id", async (req, res) => {
+router.get("/detail/:id", async (req, res) => {
   try {
     const id = req.params.id * 1;
     let record = await prismaClient.record.findUnique({
@@ -157,6 +157,75 @@ router.delete("/remove", isLoggedIn, async () => {
     res.status(201).json(deletedRecord);
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
+//유저가 작성한 포스트 불러오기 - 아이디 미지정
+router.get("/my", isLoggedIn, async (req, res) => {
+  try {
+    const records = await prismaClient.record.findMany({
+      where: {
+        user_id: Number(req.user.id),
+      },
+    });
+
+    const recordData = await Promise.all(
+      records.map(async (record) => {
+        const bookmarks = await prismaClient.bookmark.count({
+          where: {
+            user_id: req.user.id,
+            record_id: record.id,
+          },
+        });
+        const emojis = await prismaClient.comments.count({
+          where: {
+            user_id: req.user.id,
+            record_id: record.id,
+          },
+        });
+
+        return {
+          ...record,
+          bookmarks: bookmarks,
+          emojis: emojis,
+          date: `${record.created_at.getFullYear()}년 ${
+            record.created_at.getMonth() + 1
+          }월`,
+          day: record.created_at.getDate(),
+        };
+      })
+    );
+
+    const dateList = [];
+
+    recordData.map((record) => {
+      if (!dateList.includes(record.date)) {
+        dateList.push(record.date);
+      }
+    });
+
+    res
+      .status(200)
+      .json({ status: "ok", records: recordData, dates: dateList });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
+  }
+});
+
+//유저가 작성한 포스트 불러오기 - 아이디 지정
+router.get("/find/:id", async (req, res) => {
+  try {
+    const records = await prismaClient.record.findMany({
+      where: {
+        user_id: Number(req.params.id),
+      },
+    });
+
+    res.status(200).json({ status: "ok", records });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
   }
 });
 

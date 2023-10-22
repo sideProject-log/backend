@@ -53,6 +53,7 @@ model Record {
   content    String
   created_at DateTime   @default(now())
   background String
+  image      String
   user_id    Int
   bookmark   Bookmark[]
   comments   Comments[]
