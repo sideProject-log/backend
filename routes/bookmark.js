@@ -24,7 +24,7 @@ router.post("/register", isLoggedIn, async (req, res, next) => {
 });
 
 // 북마크 삭제 API
-router.delete("/remove", isLoggedIn, async (req, res, next) => {
+router.delete("/remove", async (req, res, next) => {
   const { bookmarkId } = req.body;
   console.log("remove bookmark");
 

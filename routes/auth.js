@@ -10,10 +10,10 @@ router.get("/kakao", isNotLoggedIn, passport.authenticate("kakao"));
 router.get(
   "/kakao/callback",
   passport.authenticate("kakao", {
-    failureRedirect: "/",
+    failureRedirect: process.env.FRONTURL + "/main",
   }),
   (req, res) => {
-    res.redirect("http://localhost:3000/main");
+    res.redirect(process.env.FRONTURL + "/main");
   }
 );
 
