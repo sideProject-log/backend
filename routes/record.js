@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { isLoggedIn } = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // record 작성
-router.post("/post", async (req, res) => {
+router.post("/post", isLoggedIn, async (req, res) => {
   try {
     const { title, emoji, content, background, user_id } = req.body;
 
@@ -57,7 +58,7 @@ router.post("/post", async (req, res) => {
 });
 
 // record 수정
-router.patch("/edit", async (req, res) => {
+router.patch("/edit", isLoggedIn, async (req, res) => {
   try {
     const { postId, title, emoji, content, background } = req.body;
 
@@ -79,7 +80,7 @@ router.patch("/edit", async (req, res) => {
   }
 });
 
-router.delete("/remove", async () => {
+router.delete("/remove", isLoggedIn, async () => {
   try {
     const { postId } = req.body;
 
@@ -94,29 +95,5 @@ router.delete("/remove", async () => {
     res.status(500).json({ error: "서버 에러", message: error.message });
   }
 });
-
-const dummy = [
-  {
-    title: "첫 번째 글",
-    emoji: "📝",
-    content: "이것은 첫 번째 글의 내용입니다.",
-    background: "blue",
-    user_id: 1,
-  },
-  {
-    title: "두 번째 글",
-    emoji: "✏️",
-    content: "이것은 두 번째 글의 내용입니다.",
-    background: "green",
-    user_id: 2,
-  },
-  {
-    title: "세 번째 글",
-    emoji: "📰",
-    content: "이것은 세 번째 글의 내용입니다.",
-    background: "yellow",
-    user_id: 1,
-  },
-];
 
 module.exports = router;

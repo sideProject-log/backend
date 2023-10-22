@@ -1,11 +1,12 @@
 const { PrismaClient } = require("@prisma/client");
+const { isLoggedIn } = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 
 const prismaClient = new PrismaClient();
 
 // 북마크 등록 API
-router.post("/register", async (req, res, next) => {
+router.post("/register", isLoggedIn, async (req, res, next) => {
   try {
     const { userId, recordId } = req.body;
 
@@ -23,7 +24,7 @@ router.post("/register", async (req, res, next) => {
 });
 
 // 북마크 삭제 API
-router.delete("/remove", async (req, res, next) => {
+router.delete("/remove", isLoggedIn, async (req, res, next) => {
   const { bookmarkId } = req.body;
 
   try {

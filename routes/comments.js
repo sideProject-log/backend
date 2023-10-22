@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { isLoggedIn } = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 
@@ -7,7 +8,7 @@ const prismaClient = new PrismaClient();
 const EmojiRegex = require("emoji-regex");
 
 // 이모지 댓글 등록
-router.post("/register", async (req, res, next) => {
+router.post("/register", isLoggedIn, async (req, res, next) => {
   try {
     const { userId, recordId, comment } = req.body;
 
@@ -32,7 +33,7 @@ router.post("/register", async (req, res, next) => {
 });
 
 // 이모지 삭제
-router.delete("/remove", async (req, res, next) => {
+router.delete("/remove", isLoggedIn, async (req, res, next) => {
   const { emojiId } = req.body;
 
   // TODO: 등록된 이모지 삭제

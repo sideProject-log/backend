@@ -56,9 +56,4 @@ router.post("/create", async (req, res) => {
   }
 });
 
-// 소셜로그인
-router.get("/api/auth/kakao", async (req, res) => {
-  const code = req.query.code;
-});
-
 module.exports = router;
