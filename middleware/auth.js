@@ -13,6 +13,7 @@ exports.isNotLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     next();
   } else {
+    console.log("이미 로그인 한 유저임");
     res.redirect(process.env.FRONTURL + "/main");
   }
 };
