@@ -20,20 +20,24 @@ router.get("/getAll", async (req, res) => {
       },
     });
 
+    console.log("전체", records);
+
     if (req.user) {
       const bookmarks = await prismaClient.bookmark.findMany({
         where: {
           user_id: req.user.id,
         },
       });
+
+      console.log("bookmarks", bookmarks);
+
       records.map((record) => {
-        bookmarks.map((bookmark) => {
-          if (record.id === bookmark.record_id) {
-            record.bookmarked = true;
-          } else {
-            record.bookmarked = false;
-          }
-        });
+        // records 배열을 돌면서 각 record에 대한 처리를 수행합니다.
+        const isBookmarked = bookmarks.some(
+          (bookmark) => bookmark.record_id === record.id
+        );
+        record.bookmarked = isBookmarked;
+        return record;
       });
     }
 
@@ -111,7 +115,7 @@ router.get("/detail/:id", async (req, res) => {
 // record 작성
 router.post("/post", isLoggedIn, async (req, res) => {
   try {
-    const { title, emoji, content, background } = req.body;
+    const { title, emoji, content, background, image } = req.body;
 
     const date = new Date();
 
@@ -123,6 +127,7 @@ router.post("/post", isLoggedIn, async (req, res) => {
         emoji,
         content,
         background,
+        image,
         created_at: date,
         user_id: Number(req.user.id),
       },

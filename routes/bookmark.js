@@ -40,4 +40,36 @@ router.delete("/remove", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// 북마크 삭제 API
+router.delete("/delete/:recordId", isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.user.id; // 사용자 ID 추출
+    const recordId = parseInt(req.params.recordId); // URL 파라미터에서 레코드 ID 추출
+
+    // 사용자의 북마크 목록 가져오기
+    const bookmarks = await prismaClient.bookmark.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    // 북마크 목록에서 recordId와 일치하는 북마크 삭제
+    for (const bookmark of bookmarks) {
+      if (bookmark.record_id === recordId) {
+        await prismaClient.bookmark.delete({
+          where: {
+            id: bookmark.id,
+          },
+        });
+      }
+    }
+
+    res.status(201).json({ status: "ok", message: "bookmark deleted" });
+  } catch (error) {
+    console.warn(error.message);
+
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
 module.exports = router;
