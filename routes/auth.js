@@ -6,7 +6,7 @@ const router = express.Router();
 //카카오 로그인 요청 감지
 router.get(
   "/kakao",
-  // isNotLoggedIn,
+  isNotLoggedIn,
   passport.authenticate("kakao", {
     successRedirect: process.env.FRONTURL + "/main",
     failureRedirect: process.env.FRONTURL,
@@ -16,12 +16,9 @@ router.get(
 //카카오 로그인 콜백
 router.get(
   "/kakao/callback",
-  passport.authenticate("kakao", {
-    failureRedirect: process.env.FRONTURL + "/main",
-  }),
-  (req, res) => {
+  passport.authenticate("kakao", (req, res) => {
     res.redirect(process.env.FRONTURL + "/main");
-  }
+  })
 );
 
 router.get("/isLogin", (req, res) => {
