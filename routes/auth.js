@@ -7,21 +7,21 @@ const router = express.Router();
 router.get("/kakao", passport.authenticate("kakao"));
 
 // 카카오 로그인 콜백
-router.get(
-  "/kakao/callback",
-  passport.authenticate("kakao", {
-    failureRedirect: process.env.FRONTURL + "/",
-  }),
-  (req, res) => {
-    console.log("callback", req.isAuthenticated(), req.user);
-    res.redirect(process.env.FRONTURL + "/main");
-  }
-);
+// router.get(
+//   "/kakao/callback",
+//   passport.authenticate("kakao", {
+//     failureRedirect: process.env.FRONTURL + "/",
+//   }),
+//   (req, res) => {
+//     console.log("callback", req.isAuthenticated(), req.user);
+//     res.redirect(process.env.FRONTURL + "/main");
+//   }
+// );
 
-// router.get("/kakao/callback", passport.authenticate("kakao"), (req, res) => {
-//   console.log('callback',req.isAuthenticated(),req.user);
-//   res.redirect(process.env.FRONTURL + "/");
-// });
+router.get("/kakao/callback", passport.authenticate("kakao"), (req, res) => {
+  console.log("callback", req.isAuthenticated(), req.user);
+  res.redirect(process.env.FRONTURL + "/");
+});
 
 router.get("/isLogin", (req, res) => {
   res.status(200).json({
