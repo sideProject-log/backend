@@ -24,7 +24,6 @@ router.get(
 // });
 
 router.get("/isLogin", (req, res) => {
-  console.log("req", req);
   res.status(200).json({
     status: "ok",
     result: req.isAuthenticated(),
