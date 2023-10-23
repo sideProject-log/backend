@@ -4,6 +4,7 @@
   "description": "당신의 일상을 기록하세요",
   "main": "app.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
