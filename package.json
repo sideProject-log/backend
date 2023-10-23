@@ -4,13 +4,15 @@
   "description": "당신의 일상을 기록하세요",
   "main": "app.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx prisma generate"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.4.2",
+    "@prisma/client": "5.4.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
