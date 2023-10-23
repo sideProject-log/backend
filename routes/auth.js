@@ -13,13 +13,10 @@ router.get(
   })
 );
 
-//카카오 로그인 콜백
-router.get(
-  "/kakao/callback",
-  passport.authenticate("kakao", (req, res) => {
-    res.redirect(process.env.FRONTURL + "/main");
-  })
-);
+// 카카오 로그인 콜백
+router.get("/kakao/callback", passport.authenticate("kakao"), (req, res) => {
+  res.redirect(process.env.FRONTURL + "/main");
+});
 
 router.get("/isLogin", (req, res) => {
   res.status(200).json({
