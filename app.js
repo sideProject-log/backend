@@ -21,7 +21,7 @@ const app = express();
 passportConfig();
 
 //Cors 설정
-app.use(cors({ origin: ["https://log.damie.works/"], credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 
 //request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
 app.use(express.json());
