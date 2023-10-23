@@ -10,7 +10,7 @@ const EmojiRegex = require("emoji-regex");
 // 이모지 댓글 등록
 router.post("/register", isLoggedIn, async (req, res, next) => {
   try {
-    const { userId, recordId, emoji } = req.body;
+    const { recordId, emoji } = req.body;
 
     const regex = EmojiRegex();
 
@@ -18,16 +18,21 @@ router.post("/register", isLoggedIn, async (req, res, next) => {
       throw new Error(`Emoji ${emoji} is not allowed.`);
     }
 
-    const newComment = await prismaClient.comments.create({
-      data: {
-        user_id: Number(userId),
-        record_id: recordId,
-        comment,
-      },
-    });
+    let newComment = null;
+    if (req.user) {
+      newComment = await prismaClient.comments.create({
+        data: {
+          user_id: req.user.id,
+          record_id: +recordId,
+          comment: emoji,
+        },
+      });
+    }
+    console.log(newComment);
 
     res.status(200).json({ status: "ok", newComment });
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ status: "error", message: error.message });
   }
 });
