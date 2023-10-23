@@ -115,7 +115,8 @@ router.get("/detail/:id", async (req, res) => {
 // record 작성
 router.post("/post", isLoggedIn, async (req, res) => {
   try {
-    const { title, emoji, content, background, image } = req.body;
+    let { title, emoji, content, background, image } = req.body;
+    image = image === undefined ? "" : image;
 
     const date = new Date();
 
@@ -135,6 +136,7 @@ router.post("/post", isLoggedIn, async (req, res) => {
 
     res.status(201).json({ status: "ok", data: newRecord });
   } catch (error) {
+    console.error(error.message);
     res.status(500).json({ error: "서버 에러", message: error.message });
   }
 });
