@@ -11,14 +11,17 @@ module.exports = () => {
 
   passport.deserializeUser((id, done) => {
     prismaClient.user
-      .findUnique({
-        where: {
-          id,
-        },
-      })
+      .findMany({})
+
       .then((user) => done(null, user))
       .catch((err) => done(err));
   });
 
   kakao();
 };
+
+// .findUnique({
+//   where: {
+//     id,
+//   },
+// })
