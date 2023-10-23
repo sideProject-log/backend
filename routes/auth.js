@@ -24,6 +24,8 @@ router.get("/kakao/callback", passport.authenticate("kakao"), (req, res) => {
 });
 
 router.get("/isLogin", (req, res) => {
+  console.log("callback", req.isAuthenticated(), isAuthenticated, req.user);
+
   res.status(200).json({
     status: "ok",
     result: req.isAuthenticated(),
