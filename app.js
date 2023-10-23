@@ -21,7 +21,9 @@ const app = express();
 passportConfig();
 
 //Cors 설정
-app.use(cors({ origin: true, credentials: true }));
+app.use(
+  cors({ origin: ["https://record-log.vercel.app/"], credentials: true })
+);
 
 //request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
 app.use(express.json());
@@ -36,7 +38,7 @@ app.use(
     secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true,
     },
   })
 );
