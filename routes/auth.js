@@ -13,6 +13,7 @@ router.get(
     failureRedirect: process.env.FRONTURL + "/",
   }),
   (req, res) => {
+    console.log("callback", req.isAuthenticated(), req.user);
     res.redirect(process.env.FRONTURL + "/main");
   }
 );

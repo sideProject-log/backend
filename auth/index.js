@@ -10,6 +10,7 @@ module.exports = () => {
   });
 
   passport.deserializeUser((id, done) => {
+    console.log(id);
     prismaClient.user
       .findMany({})
 
