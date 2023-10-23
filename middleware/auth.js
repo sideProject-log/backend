@@ -10,6 +10,7 @@ exports.isLoggedIn = (req, res, next) => {
 //로그인 감지
 // TODO
 exports.isNotLoggedIn = (req, res, next) => {
+  console.log("isNotLogin", req.isAuthenticated(), req.user.id);
   if (!req.isAuthenticated()) {
     next();
   } else {
