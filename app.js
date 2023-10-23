@@ -23,7 +23,7 @@ passportConfig();
 //Cors 설정
 app.use(
   cors({
-    origin: "https://record-log.vercel.app", // 허용할 도메인
+    origin: ["https://record-log.vercel.app", "http://localhost:3000"], // 허용할 도메인
     credentials: true, // credentials 허용
   })
 );
