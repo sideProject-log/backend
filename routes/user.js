@@ -103,4 +103,25 @@ router.get("/bookmarks", isLoggedIn, async (req, res) => {
   }
 });
 
+router.patch("/modify/username", isLoggedIn, async (req, res) => {
+  try {
+    const { username } = req.body;
+    let result = null;
+    if (req.user) {
+      result = await prisma.user.update({
+        where: {
+          id: req.user.id,
+        },
+        data: {
+          username,
+        },
+      });
+    }
+    res.status(201).json({ status: "ok", result });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
+  }
+});
+
 module.exports = router;
