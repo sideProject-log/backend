@@ -8,7 +8,8 @@ router.get("/kakao", passport.authenticate("kakao"));
 
 // 카카오 로그인 콜백
 router.get("/kakao/callback", passport.authenticate("kakao"), (req, res) => {
-  res.redirect(process.env.FRONTURL + "/main");
+  console.log("callback", req.isAuthenticated(), req.user.id);
+  res.redirect(process.env.FRONTURL + "/");
 });
 
 router.get("/isLogin", (req, res) => {
