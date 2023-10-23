@@ -43,7 +43,7 @@ router.delete("/remove", isLoggedIn, async (req, res, next) => {
 // 북마크 삭제 API
 router.delete("/delete/:recordId", isLoggedIn, async (req, res) => {
   try {
-    const userId = req.user.id; // 사용자 ID 추출
+    const userId = req.user.id; // 사용자 IㄴD 추출
     const recordId = parseInt(req.params.recordId); // URL 파라미터에서 레코드 ID 추출
 
     // 사용자의 북마크 목록 가져오기
