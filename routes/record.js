@@ -205,6 +205,7 @@ router.get("/my", isLoggedIn, async (req, res) => {
 
         return {
           ...record,
+          writer: record.user.username,
           bookmarks: bookmarks,
           emojis: emojis,
           date: `${record.created_at.getFullYear()}년 ${
@@ -235,13 +236,58 @@ router.get("/my", isLoggedIn, async (req, res) => {
 //유저가 작성한 포스트 불러오기 - 아이디 지정
 router.get("/find/:id", async (req, res) => {
   try {
-    const records = await prismaClient.record.findMany({
+    const user_id = +req.params.id;
+
+    const user = await prismaClient.user.findUnique({
       where: {
-        user_id: Number(req.params.id),
+        id: user_id,
       },
     });
 
-    res.status(200).json({ status: "ok", records });
+    const records = await prismaClient.record.findMany({
+      where: {
+        user_id,
+      },
+    });
+
+    const recordData = await Promise.all(
+      records.map(async (record) => {
+        const bookmarks = await prismaClient.bookmark.count({
+          where: {
+            user_id,
+            record_id: record.id,
+          },
+        });
+        const emojis = await prismaClient.comments.count({
+          where: {
+            user_id,
+            record_id: record.id,
+          },
+        });
+
+        return {
+          ...record,
+          bookmarks: bookmarks,
+          emojis: emojis,
+          date: `${record.created_at.getFullYear()}년 ${
+            record.created_at.getMonth() + 1
+          }월`,
+          day: record.created_at.getDate(),
+        };
+      })
+    );
+
+    const dateList = [];
+
+    recordData.map((record) => {
+      if (!dateList.includes(record.date)) {
+        dateList.push(record.date);
+      }
+    });
+
+    res
+      .status(200)
+      .json({ status: "ok", records: recordData, dates: dateList, user });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "서버 에러", message: error.message });
