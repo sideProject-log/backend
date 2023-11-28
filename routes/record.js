@@ -14,6 +14,7 @@ router.get("/getAll", async (req, res) => {
         user: {
           select: {
             username: true,
+            profile: true,
           },
         },
         comments: true, // 댓글을 가져오기 위한 include
@@ -68,7 +69,7 @@ router.get("/detail/:id", async (req, res) => {
     console.log(record);
 
     if (req.user) {
-      console.log(req.user);
+      console.log("user info", req.user);
       const userId = +req.user.id;
       let user = await prismaClient.user.findUnique({
         where: { id: +record.user_id },
@@ -142,17 +143,15 @@ router.post("/post", isLoggedIn, async (req, res) => {
 // record 수정
 router.patch("/edit", isLoggedIn, async (req, res) => {
   try {
-    const { postId, title, emoji, content, background } = req.body;
+    const { postId, title, content } = req.body;
 
     const newRecord = await prismaClient.record.update({
       where: {
-        id: postId,
+        id: Number(postId),
       },
       data: {
         title,
-        emoji,
         content,
-        background,
       },
     });
 
@@ -163,9 +162,10 @@ router.patch("/edit", isLoggedIn, async (req, res) => {
 });
 
 //레코드 삭제
-router.delete("/remove", isLoggedIn, async () => {
+router.delete("/remove", isLoggedIn, async (req, res) => {
   try {
     const { postId } = req.body;
+    console.log("postId", postId);
 
     const deletedRecord = await prismaClient.record.delete({
       where: {
