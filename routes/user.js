@@ -103,6 +103,7 @@ router.get("/bookmarks", isLoggedIn, async (req, res) => {
           emojiCount: emojiCount,
           writer: user.username,
           bookmarked: isBookmarked, // 북마크 여부 추가
+          user: { username: user.username, profile: user.profile },
         };
       })
     );
