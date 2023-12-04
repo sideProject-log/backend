@@ -155,7 +155,18 @@ router.patch("/edit", isLoggedIn, async (req, res) => {
       },
     });
 
-    res.status(201).json({ statusbar: "ok", newRecord });
+    if (req.user) {
+      let user = await prismaClient.user.findUnique({
+        where: { id: +newRecord.user_id },
+      });
+
+      writer = user.username;
+      profileImage = user.profile;
+    }
+
+    res
+      .status(201)
+      .json({ statusbar: "ok", ...newRecord, writer, profileImage });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
   }
