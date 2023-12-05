@@ -87,16 +87,42 @@ router.get("/detail/:id", async (req, res) => {
 
       const comments = await prismaClient.comments.findMany({
         where: {
-          user_id: req.user.id,
           record_id: id,
         },
+        include: {
+          user: {
+            select: {
+              username: true,
+              profile: true,
+            },
+          },
+        },
       });
+
+      const commentInfoList = comments
+        .map(({ id, user_id, comment, user }) => {
+          return {
+            id,
+            userId: user_id,
+            comment,
+            username: user.username,
+            profile: user.profile,
+          };
+        })
+        .sort((a, b) => a.userId - b.userId);
 
       const commentList = comments
         .map((comment) => comment.comment)
         .filter((value, index, self) => self.indexOf(value) === index);
 
-      record = { ...record, writer, profileImage, bookmarkId, commentList };
+      record = {
+        ...record,
+        writer,
+        profileImage,
+        bookmarkId,
+        commentList,
+        commentInfoList,
+      };
     }
 
     if (record !== null) {
