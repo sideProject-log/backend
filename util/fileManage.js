@@ -6,7 +6,7 @@ const supabase = createClient(
   process.env.SUPABASE_SECRET
 );
 
-async function ㅌuploadFile(file, name) {
+async function uploadFile(file, name) {
   const path = `/public/${Date.now()}-${name}`;
 
   const fileData = parseDataURL(file).body;
