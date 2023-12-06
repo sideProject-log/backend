@@ -16,6 +16,8 @@ router.post("/register", isLoggedIn, async (req, res, next) => {
         record_id: +recordId,
       },
     });
+
+    console.log("bookmark reg", newBookmark);
     res.status(201).json({ status: "ok", newBookmark });
   } catch (error) {
     console.warn(error.message);

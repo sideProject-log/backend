@@ -58,7 +58,6 @@ router.post("/create", async (req, res) => {
   }
 });
 
-//유저가 북마크한 정보 불러오기
 router.get("/bookmarks", isLoggedIn, async (req, res) => {
   try {
     const records = await prismaClient.record.findMany({
@@ -91,7 +90,6 @@ router.get("/bookmarks", isLoggedIn, async (req, res) => {
             record_id: record.id,
           },
         });
-
         // 북마크 정보를 기반으로 record에 필드를 추가
         const isBookmarked = bookmarks ? true : false;
         const emojiCount = record?.comments?.length
