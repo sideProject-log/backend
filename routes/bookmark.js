@@ -69,7 +69,6 @@ router.delete("/delete/:recordId", isLoggedIn, async (req, res) => {
     res.status(201).json({ status: "ok", message: "bookmark deleted" });
   } catch (error) {
     console.warn(error.message);
-    console.log("여기서오류 4");
 
     res.status(500).json({ status: "error", message: error.message });
   }
