@@ -157,6 +157,7 @@ router.post("/post", isLoggedIn, async (req, res) => {
     const newRecord = await prismaClient.record.create({
       data: {
         ...req.body,
+        created_at: date,
         user_id: Number(req.user.id),
       },
     });
