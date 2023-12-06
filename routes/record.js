@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const { isLoggedIn } = require("../middleware/auth");
 const cookieParser = require("cookie-parser");
 const express = require("express");
+const { uploadFile } = require("../util/fileManage");
 const router = express.Router();
 
 const prismaClient = new PrismaClient();
