@@ -148,6 +148,8 @@ router.post("/post", isLoggedIn, async (req, res) => {
       req.body.image = data.url;
     }
 
+    console.log(req.body);
+
     const date = new Date();
 
     date.setHours(date.getHours() + 9);
