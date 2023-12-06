@@ -142,7 +142,10 @@ router.get("/detail/:id", async (req, res) => {
 // record 작성
 router.post("/post", isLoggedIn, async (req, res) => {
   try {
-    const { title, emoji, content, background, image } = req.body;
+    if (req.body.image) {
+      const data = await uploadFile(req.body.image, "logo.png");
+      req.body.image = data.url;
+    }
 
     const date = new Date();
 
@@ -150,18 +153,14 @@ router.post("/post", isLoggedIn, async (req, res) => {
 
     const newRecord = await prismaClient.record.create({
       data: {
-        title,
-        emoji,
-        content,
-        background,
-        image,
-        created_at: date,
+        ...req.body,
         user_id: Number(req.user.id),
       },
     });
 
     res.status(201).json({ status: "ok", data: newRecord });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "서버 에러", message: error.message });
   }
 });
