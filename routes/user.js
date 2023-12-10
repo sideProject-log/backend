@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { isLoggedIn } = require("../middleware/auth");
+const { uploadFile } = require("../util/fileManage");
 const router = express.Router();
 
 const prismaClient = new PrismaClient();
@@ -140,6 +141,34 @@ router.patch("/modify/username", isLoggedIn, async (req, res) => {
         },
       });
     }
+    res.status(201).json({ status: "ok" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: "서버 에러", message: error.message });
+  }
+});
+
+router.patch("/modify/userimg", isLoggedIn, async (req, res) => {
+  try {
+    if (req.body.image) {
+      const data = await uploadFile(req.body.image, "logo.png");
+      req.body.image = data.url;
+    }
+
+    console.log("req.body:", req.body);
+
+    let result = null;
+    result = await prismaClient.user.update({
+      where: {
+        id: req.user.id,
+      },
+      data: {
+        profile: req.body.image,
+      },
+    });
+
+    console.log("result:", result);
+
     res.status(201).json({ status: "ok" });
   } catch (error) {
     console.log(error.message);
